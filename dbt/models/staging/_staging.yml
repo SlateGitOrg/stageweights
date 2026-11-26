@@ -1,0 +1,55 @@
+version: 2
+
+models:
+  - name: stg_users
+    columns:
+      - name: user_id
+        data_tests: [unique, not_null]
+      - name: segment
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [smb, mid_market, enterprise]
+
+  - name: stg_opportunities
+    columns:
+      - name: opportunity_id
+        data_tests: [unique, not_null]
+      - name: owner_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_users')
+                field: user_id
+      - name: created_at
+        data_tests: [not_null]
+      - name: created_stage
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [Prospecting, Discovery, Solution, Proposal, Negotiation, Contract Sent]
+      - name: stage
+        data_tests:
+          - accepted_values:
+              arguments:
+                values:
+                  [Prospecting, Discovery, Solution, Proposal, Negotiation, Contract Sent, Closed Won, Closed Lost]
+
+  - name: stg_field_history
+    columns:
+      - name: opportunity_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_opportunities')
+                field: opportunity_id
+      - name: field
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [stage, amount, close_date, rep_probability]
+      - name: changed_at
+        data_tests: [not_null]

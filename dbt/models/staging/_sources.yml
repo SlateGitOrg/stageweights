@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: crm
+    description: Raw CRM exports. Read as text so every cast is explicit in staging.
+    meta:
+      external_location: "read_csv('{{ var('raw_dir') }}/{name}.csv', all_varchar = true)"
+    tables:
+      - name: opportunities
+      - name: opportunity_field_history
+      - name: users

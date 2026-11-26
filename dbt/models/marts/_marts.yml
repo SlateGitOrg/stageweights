@@ -1,0 +1,119 @@
+version: 2
+
+models:
+  - name: dim_stages
+    description: Open and closed stages with the CRM's configured default probabilities.
+    columns:
+      - name: stage
+        data_tests: [unique, not_null]
+      - name: stage_order
+        data_tests: [unique, not_null]
+
+  - name: dim_snapshot_dates
+    description: Complete 13-week fiscal quarters and the instant each snapshot is taken.
+    columns:
+      - name: quarter_index
+        data_tests: [unique, not_null]
+      - name: snapshot_date
+        data_tests: [unique, not_null]
+
+  - name: fct_pipeline_snapshots
+    description: Open pipeline at each quarter start, with the in-quarter outcome.
+    columns:
+      - name: snapshot_row_id
+        data_tests: [unique, not_null]
+      - name: quarter_index
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_snapshot_dates')
+                field: quarter_index
+      - name: opportunity_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_opportunities')
+                field: opportunity_id
+      - name: stage
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [Prospecting, Discovery, Solution, Proposal, Negotiation, Contract Sent]
+      - name: push_bucket
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['0', '1-2', '3+']
+      - name: outcome
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [won, lost, slipped, open]
+
+  - name: fct_quarter_creations
+    columns:
+      - name: quarter_index
+        data_tests: [unique, not_null]
+
+  - name: fct_stage_cell_rates
+    description: Pre-fallback win-in-quarter rate per forecast quarter, stage and push bucket.
+    columns:
+      - name: stage
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_stages')
+                field: stage
+      - name: push_bucket
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['0', '1-2', '3+']
+
+  - name: fct_stage_weights
+    description: Learned weights after the thin-cell fallback.
+    columns:
+      - name: weight
+        data_tests: [not_null]
+      - name: weight_source
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [cell, stage, crm_default]
+      - name: stage
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_stages')
+                field: stage
+
+  - name: fct_forecast_backtest
+    columns:
+      - name: quarter_index
+        data_tests: [unique, not_null]
+      - name: actual_won
+        data_tests: [not_null]
+
+  - name: fct_calibration
+    columns:
+      - name: method
+        data_tests:
+          - unique
+          - accepted_values:
+              arguments:
+                values: [crm_default, rep_entered, learned]
+
+  - name: fct_hygiene_flags
+    columns:
+      - name: opportunity_id
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_opportunities')
+                field: opportunity_id

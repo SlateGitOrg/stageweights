@@ -1,0 +1,24 @@
+name: stageweights
+version: "0.1.0"
+config-version: 2
+profile: stageweights
+
+model-paths: ["models"]
+test-paths: ["tests"]
+clean-targets: ["target"]
+
+flags:
+  send_anonymous_usage_stats: false
+
+vars:
+  raw_dir: "../data"
+  data_through: "2026-01-01"
+  fiscal_start: "2023-01-02"
+  quarter_days: 91
+  backtest_start_quarter: 4
+  min_cell_rows: 30
+  wilson_z: 1.6448536269514722
+
+models:
+  stageweights:
+    +materialized: table

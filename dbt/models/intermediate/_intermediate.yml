@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: int_opportunity_intervals
+    description: Validity intervals per opportunity and field, replayed from the change log.
+    columns:
+      - name: opportunity_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_opportunities')
+                field: opportunity_id
+      - name: field
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [stage, amount, close_date, rep_probability]
+      - name: valid_from
+        data_tests: [not_null]
+      - name: value
+        data_tests: [not_null]

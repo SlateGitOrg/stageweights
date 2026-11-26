@@ -1,0 +1,7 @@
+stageweights:
+  target: local
+  outputs:
+    local:
+      type: duckdb
+      path: "{{ env_var('STAGEWEIGHTS_DUCKDB_PATH', 'target/stageweights.duckdb') }}"
+      threads: 1

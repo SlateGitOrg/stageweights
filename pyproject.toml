@@ -1,0 +1,42 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "stageweights"
+version = "0.1.0"
+description = "Pipeline forecast weights learned from CRM field history replayed as of each quarter start."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "stageweights contributors" }]
+dependencies = [
+  "dbt-core>=1.10,<2",
+  "dbt-duckdb>=1.10,<2",
+  "duckdb>=1.0",
+  "pandas>=2.0",
+  "numpy>=1.26",
+  "typer>=0.12",
+  "rich>=13",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.5"]
+
+[project.scripts]
+stageweights = "stageweights.cli:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/stageweights"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["error"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
